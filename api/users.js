@@ -1,5 +1,4 @@
-require('dotenv').config();
-const { MongoClient } = require('mongodb');
+const { MongoClient } = require("mongodb");
 
 let client;
 let db;
@@ -10,7 +9,7 @@ async function connectDB() {
     await client.connect();
   }
   if (!db) {
-    db = client.db("pagination");  // your real DB name
+    db = client.db("pagination");
   }
   return db;
 }
@@ -22,25 +21,19 @@ module.exports = async (req, res) => {
 
   try {
     const db = await connectDB();
-    const usersCollection = db.collection('users');
+    const usersCollection = db.collection("users");
 
     const total = await usersCollection.countDocuments();
-    const users = await usersCollection
-      .find()
-      .skip(skip)
-      .limit(limit)
-      .toArray();
+    const users = await usersCollection.find().skip(skip).limit(limit).toArray();
 
     res.status(200).json({
       page,
       limit,
       totalPages: Math.ceil(total / limit),
       totalItems: total,
-      users
+      users,
     });
-
   } catch (err) {
-    console.error("Serverless error:", err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: err });
   }
 };
